@@ -1,0 +1,93 @@
+group 'com.example.stripe_tap_to_pay'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.7.10'
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 31
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+
+    defaultConfig {
+        minSdkVersion 16
+    }
+
+    ext {
+        okhttp_version = '4.10.0'
+        retrofit_version = '2.9.0'
+        stripeTerminalVersion = "2.17.1"
+    }
+
+    dependencies {
+        testImplementation 'org.jetbrains.kotlin:kotlin-test'
+        testImplementation 'org.mockito:mockito-core:5.0.0'
+
+
+        implementation fileTree(dir: "libs", include: ["*.jar"])
+
+        implementation "com.google.android.material:material:1.6.1"
+        implementation "androidx.appcompat:appcompat:1.5.1"
+        implementation "androidx.core:core-ktx:1.9.0"
+        implementation "androidx.constraintlayout:constraintlayout:2.1.4"
+
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+        // Stripe Terminal library
+        implementation "com.stripe:stripeterminal-localmobile:2.20.0"
+        implementation "com.stripe:stripeterminal-core:2.20.0"
+
+
+        // OK HTTP
+        implementation "com.squareup.okhttp3:okhttp:$okhttp_version"
+
+        // Retrofit
+        implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+        implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+
+    }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+
+            testLogging {
+               events "passed", "skipped", "failed", "standardOut", "standardError"
+               outputs.upToDateWhen {false}
+               showStandardStreams = true
+            }
+        }
+    }
+}

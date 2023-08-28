@@ -1,0 +1,48 @@
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+import 'package:stripe_tap_to_pay/data/payment_intent.dart';
+
+import 'data/reader.dart';
+import 'stripe_tap_to_pay_method_channel.dart';
+
+abstract class StripeTapToPayPlatform extends PlatformInterface {
+  /// Constructs a StripeTapToPayPlatform.
+  StripeTapToPayPlatform() : super(token: _token);
+
+  static final Object _token = Object();
+
+  static StripeTapToPayPlatform _instance = MethodChannelStripeTapToPay();
+
+  /// The default instance of [StripeTapToPayPlatform] to use.
+  ///
+  /// Defaults to [MethodChannelStripeTapToPay].
+  static StripeTapToPayPlatform get instance => _instance;
+
+  /// Platform-specific implementations should set this with their own
+  /// platform-specific class that extends [StripeTapToPayPlatform] when
+  /// they register themselves.
+  static set instance(StripeTapToPayPlatform instance) {
+    PlatformInterface.verifyToken(instance, _token);
+    _instance = instance;
+  }
+
+  Future<bool> initializeStripeTerminal({required String backendUrl}) {
+    throw UnimplementedError(
+        'initializeStripeTerminal() has not been implemented.');
+  }
+
+  Future<Reader> connectReader() {
+    throw UnimplementedError('connectReader() has not been implemented.');
+  }
+
+  Future<void> createPayment(
+    int amount, {
+    String currency = 'usd',
+    bool skipTipping = true,
+    bool extendedAuth = false,
+    bool incrementalAuth = false,
+    required Function(PaymentIntent) onPaymentSuccess,
+    required Function() onPaymentError,
+  }) {
+    throw UnimplementedError('createPayment() has not been implemented.');
+  }
+}
