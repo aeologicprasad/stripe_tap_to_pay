@@ -61,7 +61,7 @@ android {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
         // Stripe Terminal library
-//        implementation "com.stripe:stripeterminal-localmobile:2.23.1"
+        implementation "com.stripe:stripeterminal-localmobile:2.23.1"
         implementation "com.stripe:stripeterminal-core:2.23.1"
 
 
