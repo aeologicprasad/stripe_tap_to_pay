@@ -55,19 +55,14 @@ android {
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.0.0'
 
-
         implementation fileTree(dir: "libs", include: ["*.jar"])
 
-        implementation "com.google.android.material:material:1.6.1"
-        implementation "androidx.appcompat:appcompat:1.5.1"
         implementation "androidx.core:core-ktx:1.9.0"
-        implementation "androidx.constraintlayout:constraintlayout:2.1.4"
-
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
         // Stripe Terminal library
-        implementation "com.stripe:stripeterminal-localmobile:2.20.0"
-        implementation "com.stripe:stripeterminal-core:2.20.0"
+        implementation "com.stripe:stripeterminal-localmobile:2.23.1"
+        implementation "com.stripe:stripeterminal-core:2.23.1"
 
 
         // OK HTTP
