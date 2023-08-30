@@ -57,8 +57,18 @@ android {
 
         implementation fileTree(dir: "libs", include: ["*.jar"])
 
+//        implementation "com.google.android.material:material:1.6.1"
+//        implementation "androidx.appcompat:appcompat:1.5.1"
+//        implementation "androidx.constraintlayout:constraintlayout:2.1.4"
+
+
+        // Kotlin
         implementation "androidx.core:core-ktx:1.9.0"
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+
+        // Location 
+        implementation 'com.google.android.gms:play-services-location:16.0.0'
 
         // Stripe Terminal library
         implementation "com.stripe:stripeterminal-localmobile:2.23.1"

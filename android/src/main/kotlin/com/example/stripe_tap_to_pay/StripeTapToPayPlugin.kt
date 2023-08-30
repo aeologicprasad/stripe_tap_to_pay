@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.example.stripe_tap_to_pay.service.BASE_URL
 import com.example.stripe_tap_to_pay.stripe.StripeInitializer
 import com.example.stripe_tap_to_pay.stripe.StripePaymentHandler
@@ -18,6 +19,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.PluginRegistry;
+import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
 
 /** StripeTapToPayPlugin */
 class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
@@ -47,7 +49,7 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         when (call.method) {
             "initializeStripeTerminal" -> {
                 BASE_URL = call.argument<String>("backendUrl")?:""
-                stripeInitializer.initializeStripeTerminal(activity!!, result)
+                stripeInitializer.setupTapToPay(activity!!, result)
             }
 
             "connectReader" -> {
@@ -78,17 +80,19 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         activity = binding.activity
         binding.addRequestPermissionsResultListener(this)
         binding.addActivityResultListener(this)
-        (binding.lifecycle as HiddenLifecycleReference)
-            .lifecycle
-            .addObserver(LifecycleEventObserver { _, event ->
-                if (stripeInitializer.isPermissionAvailable && previousEvent == Lifecycle.Event.ON_STOP) {
-                    Log.d(TAG, "Re-initializing Stripe Terminal...")
-                    CoroutineScope(Dispatchers.Main).launch {
-                        stripeInitializer.initializeStripeTerminal(activity!!, result!!)
-                    }
-                }
-                previousEvent = event
-            })
+//        (binding.lifecycle as HiddenLifecycleReference)
+//            .lifecycle
+//            .addObserver(LifecycleEventObserver { _, event ->
+//                Log.d(TAG, "$event")
+//                if (!stripeInitializer.gpsDialogActive && previousEvent == Lifecycle.Event.ON_PAUSE && event == Lifecycle.Event.ON_RESUME) {
+//                    Log.d(TAG, "Re-initializing Stripe Terminal...")
+//                    CoroutineScope(Dispatchers.Main).launch {
+//                        stripeInitializer.initializeTerminal(activity!!, result!!)
+//                        stripeInitializer.gpsDialogActive = false
+//                    }
+//                }
+//                previousEvent = event
+//            })
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
@@ -101,7 +105,7 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         activity = binding.activity
         binding.addRequestPermissionsResultListener(this)
         binding.addActivityResultListener(this)
-        stripeInitializer.initializeStripeTerminal(activity!!, result!!)
+        stripeInitializer.setupTapToPay(activity!!, result!!)
     }
 
     override fun onDetachedFromActivity() {
@@ -111,6 +115,11 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
         Log.d(TAG, "onActivityResult: $requestCode, $resultCode, $data");
+        if(requestCode==102 && resultCode==-1){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                stripeInitializer.initializeTerminal(activity!!, result!!)
+            }
+        }
         return true
     }
 
@@ -122,7 +131,7 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         grantResults: IntArray
     ): Boolean {
         Log.d(TAG, "onRequestPermissionsResult: $requestCode, $permissions, $grantResults");
-        stripeInitializer.initializeStripeTerminal(activity!!, result!!)
+        stripeInitializer.setupTapToPay(activity!!, result!!)
         return true
     }
 
