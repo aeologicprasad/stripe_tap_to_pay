@@ -132,9 +132,15 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         permissions: Array<String>,
         grantResults: IntArray
     ): Boolean {
-        Log.d(TAG, "onRequestPermissionsResult: $requestCode, $permissions, $grantResults");
-        stripeInitializer.setupTapToPay(activity!!, result!!)
-        return true
+        Log.d(TAG, "onRequestPermissionsResult: $requestCode, ${permissions.joinToString(" ")}, ${grantResults.joinToString(" ")}");
+        if(grantResults.contains(-1)){
+            result?.error("permission_error", "Permissions required to continue with tap to pay feature", null)
+            return false
+        }else{
+            stripeInitializer.setupTapToPay(activity!!, result!!)
+            return true
+        }
+
     }
 
 
