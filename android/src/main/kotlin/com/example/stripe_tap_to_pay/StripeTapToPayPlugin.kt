@@ -121,7 +121,7 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 stripeInitializer.initializeTerminal(activity!!, result!!)
             }
         }else if (requestCode==102 && resultCode==0){
-            result?.success(false)
+            result?.error("location_service_error", "Location service must be enabled for tap to pay feature", null)
         }
         return true
     }

@@ -100,7 +100,7 @@ class StripePaymentHandler {
                     object : ReaderCallback {
                         override fun onFailure(e: TerminalException) {
                             Log.e(TAG, e.errorMessage)
-                            result?.error("102", e.errorMessage, null)
+                            result?.error("reader_error", e.errorMessage, null)
                         }
 
                         override fun onSuccess(reader: Reader) {
@@ -117,7 +117,7 @@ class StripePaymentHandler {
 
             override fun onFailure(e: TerminalException) {
                 Log.e(TAG, e.errorMessage)
-                result?.error("102", e.errorMessage, e)
+                result?.error("reader_error", e.errorMessage, e)
             }
         })
     }
