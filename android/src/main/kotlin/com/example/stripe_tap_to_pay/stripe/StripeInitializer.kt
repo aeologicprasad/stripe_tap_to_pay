@@ -81,7 +81,7 @@ class StripeInitializer {
                     TerminalEventListener()
                 )
                 Log.d(TAG, "Stripe Terminal Initialized Successfully")
-//                result.success(true)
+                result.success(true)
             } catch (e: TerminalException) {
                 Log.e(
                     TAG,

@@ -119,6 +119,8 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 stripeInitializer.initializeTerminal(activity!!, result!!)
             }
+        }else if (requestCode==102 && resultCode==0){
+            result?.success(false)
         }
         return true
     }
