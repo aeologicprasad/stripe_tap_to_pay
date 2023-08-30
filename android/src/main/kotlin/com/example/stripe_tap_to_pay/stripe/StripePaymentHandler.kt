@@ -31,9 +31,11 @@ class StripePaymentHandler {
     private var result: MethodChannel.Result? = null
     private val gson = Gson()
     private val locationsList = MutableStateFlow(LocationListState())
+    private var isSimulated = false
 
-    fun connectReader(result: MethodChannel.Result) {
+    fun connectReader(isSimulated: Boolean, result: MethodChannel.Result) {
         this.result = result
+        this.isSimulated = isSimulated
         if (locationsList.value.locations.isEmpty()) {
             loadLocations()
         } else {
@@ -45,7 +47,7 @@ class StripePaymentHandler {
     private val locationCallback = object : LocationListCallback {
         override fun onFailure(e: TerminalException) {
             Log.e(TAG, "Failed to load reader locations: ${e.errorMessage}")
-            result?.error("11", e.errorMessage, null)
+            result?.error("fetch_reader_error", e.errorMessage, null)
         }
 
         override fun onSuccess(locations: List<Location>, hasMore: Boolean) {
@@ -79,7 +81,7 @@ class StripePaymentHandler {
         val config = DiscoveryConfiguration(
             timeout = 0,
             discoveryMethod = DiscoveryMethod.LOCAL_MOBILE,
-            isSimulated = false,
+            isSimulated = isSimulated,
             location = locationsList.value.locations[0].id
         )
 

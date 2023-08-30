@@ -21,8 +21,9 @@ class MethodChannelStripeTapToPay extends StripeTapToPayPlatform {
   }
 
   @override
-  Future<Reader> connectReader() async {
-    final result = await methodChannel.invokeMethod('connectReader');
+  Future<Reader> connectReader({required bool isSimulated}) async {
+    final result = await methodChannel
+        .invokeMethod('connectReader', {'isSimulated': isSimulated});
     return Reader.fromJson(json.decode(result ?? '{}'));
   }
 

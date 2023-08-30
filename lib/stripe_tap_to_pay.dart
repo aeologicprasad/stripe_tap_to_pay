@@ -9,8 +9,9 @@ class StripeTapToPay {
         .initializeStripeTerminal(backendUrl: backendUrl);
   }
 
-  Future<Reader> connectReader() {
-    return StripeTapToPayPlatform.instance.connectReader();
+  Future<Reader> connectReader({bool isSimulated = false}) {
+    return StripeTapToPayPlatform.instance
+        .connectReader(isSimulated: isSimulated);
   }
 
   Future<void> createPayment(

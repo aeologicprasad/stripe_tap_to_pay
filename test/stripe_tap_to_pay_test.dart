@@ -11,7 +11,7 @@ class MockStripeTapToPayPlatform
   Future<String?> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<Reader> connectReader() {
+  Future<Reader> connectReader({required bool isSimulated}) {
     // TODO: implement connectReader
     throw UnimplementedError();
   }

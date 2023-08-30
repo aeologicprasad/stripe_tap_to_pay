@@ -53,7 +53,8 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             }
 
             "connectReader" -> {
-                paymentHandler.connectReader(result)
+                val isSimulated = call.argument<Boolean>("isSimulated")?:false
+                paymentHandler.connectReader(isSimulated, result)
             }
 
             "createPayment" -> {
@@ -134,7 +135,7 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
     ): Boolean {
         Log.d(TAG, "onRequestPermissionsResult: $requestCode, ${permissions.joinToString(" ")}, ${grantResults.joinToString(" ")}");
         if(requestCode==101 && grantResults.contains(-1)){
-            result?.error("permission_error", "Permissions required to continue with tap to pay feature", null)
+            result?.error("permission_request_error", "Permissions required to continue with tap to pay feature", null)
             return false
         }else if(requestCode==101){
             stripeInitializer.setupTapToPay(activity!!, result!!)

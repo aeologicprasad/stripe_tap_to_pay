@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> connectReader() async {
     try {
-      final result = await _plugin.connectReader();
+      final result = await _plugin.connectReader(isSimulated: true);
       readerData = result.id ?? 'connected';
       debugPrint('Reader data: ${result.id}');
       setState(() {});

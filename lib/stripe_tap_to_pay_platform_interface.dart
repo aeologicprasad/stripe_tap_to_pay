@@ -30,7 +30,7 @@ abstract class StripeTapToPayPlatform extends PlatformInterface {
         'initializeStripeTerminal() has not been implemented.');
   }
 
-  Future<Reader> connectReader() {
+  Future<Reader> connectReader({required bool isSimulated}) {
     throw UnimplementedError('connectReader() has not been implemented.');
   }
 

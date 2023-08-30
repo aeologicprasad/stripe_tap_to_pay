@@ -141,7 +141,7 @@ class StripeInitializer {
                     if (exception is ResolvableApiException) {
                         // Location settings are not satisfied, show dialog
                         try {
-                            exception.startResolutionForResult(activity, 102)
+                            exception.startResolutionForResult(activity, LOCATION_REQUEST_CODE)
                         } catch (sendEx: IntentSender.SendIntentException) {
                             // Ignore the error.
                         }
