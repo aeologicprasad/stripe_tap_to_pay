@@ -140,8 +140,6 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
             stripeInitializer.setupTapToPay(activity!!, result!!)
             return true
         }
-
+        return true;
     }
-
-
 }
