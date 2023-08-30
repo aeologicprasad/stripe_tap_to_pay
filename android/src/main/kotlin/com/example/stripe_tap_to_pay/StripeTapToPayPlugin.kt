@@ -78,17 +78,17 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         activity = binding.activity
         binding.addRequestPermissionsResultListener(this)
         binding.addActivityResultListener(this)
-//        (binding.lifecycle as HiddenLifecycleReference)
-//            .lifecycle
-//            .addObserver(LifecycleEventObserver { _, event ->
-//                if (stripeInitializer.isPermissionAvailable && previousEvent == Lifecycle.Event.ON_STOP) {
-//                    Log.d(TAG, "Re-initializing Stripe Terminal...")
-//                    CoroutineScope(Dispatchers.Main).launch {
-//                        stripeInitializer.initializeStripeTerminal(activity!!, result!!)
-//                    }
-//                }
-//                previousEvent = event
-//            })
+        (binding.lifecycle as HiddenLifecycleReference)
+            .lifecycle
+            .addObserver(LifecycleEventObserver { _, event ->
+                if (stripeInitializer.isPermissionAvailable && previousEvent == Lifecycle.Event.ON_STOP) {
+                    Log.d(TAG, "Re-initializing Stripe Terminal...")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        stripeInitializer.initializeStripeTerminal(activity!!, result!!)
+                    }
+                }
+                previousEvent = event
+            })
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
