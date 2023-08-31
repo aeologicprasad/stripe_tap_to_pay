@@ -45,4 +45,8 @@ abstract class StripeTapToPayPlatform extends PlatformInterface {
   }) {
     throw UnimplementedError('createPayment() has not been implemented.');
   }
+
+  Future<bool> disconnectReader() {
+    throw UnimplementedError('disconnectReader() has not been implemented.');
+  }
 }

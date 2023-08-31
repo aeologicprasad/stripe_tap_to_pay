@@ -35,6 +35,12 @@ class MockStripeTapToPayPlatform
     // TODO: implement createPayment
     throw UnimplementedError();
   }
+
+  @override
+  Future<bool> disconnectReader() {
+    // TODO: implement disconnectReader
+    throw UnimplementedError();
+  }
 }
 
 void main() {

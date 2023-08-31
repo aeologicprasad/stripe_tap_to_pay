@@ -75,6 +75,25 @@ class StripePaymentHandler {
     }
 
 
+
+    fun disconnectReader(result: MethodChannel.Result) {
+        val callback: Callback
+        Terminal.getInstance().disconnectReader(callback = object : Callback{
+            override fun onFailure(e: TerminalException) {
+                Log.e(TAG, "${e.message}")
+                result.error("reader_error", "${e.message}", null);
+            }
+
+            override fun onSuccess() {
+                Log.d(TAG, "Reader Disconnected")
+                result.success(true);
+            }
+
+        });
+    }
+
+
+
     // Discover available readers: User mobile phone as a Reader
     private fun discoverReaders() {
         Log.d(TAG, "Discovering Readers...")
@@ -173,13 +192,24 @@ class StripePaymentHandler {
                             response.body()?.secret!!,
                             createPaymentIntentCallback
                         )
-                    } else {
-                        Log.e(TAG, "Failed to get secrete key from server")
-                        result?.error(
-                            "secret_key_error",
-                            "Failed to get secrete key from server",
-                            null
-                        )
+                    }
+                    else {
+                        if(response.body()==null){
+                            Log.e(TAG, "Failed to get secrete key from server")
+                            result?.error(
+                                "secret_key_error",
+                                "Failed to get secrete key from server",
+                                null
+                            )
+                        }else{
+                            Log.e(TAG, "${response.body()}")
+                            result?.error(
+                                "secret_key_error",
+                                "${response.body()}",
+                                null
+                            )
+                        }
+
                     }
                 }
 

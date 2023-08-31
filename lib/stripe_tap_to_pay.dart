@@ -14,6 +14,10 @@ class StripeTapToPay {
         .connectReader(isSimulated: isSimulated);
   }
 
+  Future<bool> disconnectReader() {
+    return StripeTapToPayPlatform.instance.disconnectReader();
+  }
+
   Future<void> createPayment(
     int amount, {
     String currency = 'usd',

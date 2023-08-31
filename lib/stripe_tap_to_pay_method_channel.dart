@@ -28,6 +28,12 @@ class MethodChannelStripeTapToPay extends StripeTapToPayPlatform {
   }
 
   @override
+  Future<bool> disconnectReader() async {
+    final result = await methodChannel.invokeMethod('disconnectReader');
+    return result ?? false;
+  }
+
+  @override
   Future<void> createPayment(
     int amount, {
     String currency = 'usd',

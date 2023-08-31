@@ -57,8 +57,12 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
                 paymentHandler.connectReader(isSimulated, result)
             }
 
+            "disconnectReader" -> {
+                paymentHandler.disconnectReader(result)
+            }
+
             "createPayment" -> {
-                val amount: Long = (call.argument<Int>("amount") ?: 1).toLong()
+                val amount: Long = ((call.argument<Int>("amount") ?: 1)*100).toLong()
                 val currency = call.argument<String>("currency")?:"usd"
                 val skipTipping = call.argument<Boolean>("skipTipping")?:true
                 val extendedAuth = call.argument<Boolean>("extendedAuth")?:false
