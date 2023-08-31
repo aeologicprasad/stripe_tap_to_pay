@@ -77,7 +77,12 @@ class StripePaymentHandler {
 
 
     fun disconnectReader(result: MethodChannel.Result) {
-        val callback: Callback
+
+        if(!Terminal.isInitialized()){
+            result.success(false);
+            return;
+        }
+
         Terminal.getInstance().disconnectReader(callback = object : Callback{
             override fun onFailure(e: TerminalException) {
                 Log.e(TAG, "${e.message}")
@@ -92,6 +97,27 @@ class StripePaymentHandler {
         });
     }
 
+
+
+
+    // Check if terminal connected
+    fun isTerminalInitialized(result: MethodChannel.Result){
+         result.success(Terminal.isInitialized());
+    }
+
+    // Check if reader connected or not
+    fun isReaderConnected(result: MethodChannel.Result){
+        try{
+            if(!Terminal.isInitialized()){
+                result.success(false);
+                return;
+            }
+            val isConnected = Terminal.getInstance().connectedReader!=null;
+            result.success(isConnected);
+        }catch (e: Exception){
+            result.error("terminal_error", "${e.message}", null);
+        }
+    }
 
 
     // Discover available readers: User mobile phone as a Reader

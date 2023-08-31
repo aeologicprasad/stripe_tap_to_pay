@@ -41,6 +41,18 @@ class MockStripeTapToPayPlatform
     // TODO: implement disconnectReader
     throw UnimplementedError();
   }
+
+  @override
+  Future<bool> isTerminalInitialized() {
+    // TODO: implement disconnectReader
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> isReaderConnected() {
+    // TODO: implement disconnectReader
+    throw UnimplementedError();
+  }
 }
 
 void main() {

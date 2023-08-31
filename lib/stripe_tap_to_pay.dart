@@ -18,6 +18,14 @@ class StripeTapToPay {
     return StripeTapToPayPlatform.instance.disconnectReader();
   }
 
+  Future<bool> isTerminalInitialized() {
+    return StripeTapToPayPlatform.instance.isTerminalInitialized();
+  }
+
+  Future<bool> isReaderConnected() {
+    return StripeTapToPayPlatform.instance.isReaderConnected();
+  }
+
   Future<void> createPayment(
     int amount, {
     String currency = 'usd',

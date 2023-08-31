@@ -55,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> connectReader() async {
     try {
+      debugPrint("isTerminalInitialized: ${await _plugin.isReaderConnected()}");
       final result = await _plugin.connectReader(isSimulated: true);
       readerData = result.id ?? 'connected';
       debugPrint('Reader data: ${result.id}');
@@ -83,6 +84,28 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  void checkIsTerminalInitialized() async {
+    try {
+      final result = await _plugin.isTerminalInitialized();
+      debugPrint('isTerminalInitialized: $result');
+      setState(() {});
+    } on PlatformException catch (e) {
+      // debugPrint('Error: $e');
+      Fluttertoast.showToast(msg: e.message ?? 'Error occurred');
+    }
+  }
+
+  void disconnectReader() async {
+    try {
+      final result = await _plugin.disconnectReader();
+      debugPrint('disconnectReader: $result');
+      setState(() {});
+    } on PlatformException catch (e) {
+      // debugPrint('Error: $e');
+      Fluttertoast.showToast(msg: e.message ?? 'Error occurred');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,6 +119,11 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             ElevatedButton(
                 onPressed: () {
+                  checkIsTerminalInitialized();
+                },
+                child: const Text('Is Terminal Initialized')),
+            ElevatedButton(
+                onPressed: () {
                   initializeTerminal();
                 },
                 child: const Text('Initialize Stripe')),
@@ -104,6 +132,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   connectReader();
                 },
                 child: const Text('Connect Reader')),
+            ElevatedButton(
+                onPressed: () {
+                  disconnectReader();
+                },
+                child: const Text('Disconnect Reader')),
             ElevatedButton(
                 onPressed: () {
                   createPayment();

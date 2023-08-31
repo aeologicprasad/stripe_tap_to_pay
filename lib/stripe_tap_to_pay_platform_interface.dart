@@ -49,4 +49,13 @@ abstract class StripeTapToPayPlatform extends PlatformInterface {
   Future<bool> disconnectReader() {
     throw UnimplementedError('disconnectReader() has not been implemented.');
   }
+
+  Future<bool> isReaderConnected() {
+    throw UnimplementedError('isReaderConnected() has not been implemented.');
+  }
+
+  Future<bool> isTerminalInitialized() {
+    throw UnimplementedError(
+        'isTerminalInitialized() has not been implemented.');
+  }
 }

@@ -34,6 +34,18 @@ class MethodChannelStripeTapToPay extends StripeTapToPayPlatform {
   }
 
   @override
+  Future<bool> isTerminalInitialized() async {
+    final result = await methodChannel.invokeMethod('isTerminalInitialized');
+    return result ?? false;
+  }
+
+  @override
+  Future<bool> isReaderConnected() async {
+    final result = await methodChannel.invokeMethod('isReaderConnected');
+    return result ?? false;
+  }
+
+  @override
   Future<void> createPayment(
     int amount, {
     String currency = 'usd',
