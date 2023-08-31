@@ -2,7 +2,7 @@ class Reader {
   // final DeviceType deviceType;
   // final LocationStatus locationStatus;
   final String? id;
-  final bool isSimulated;
+  final bool? isSimulated;
   // final NetworkStatus? networkStatus;
   final String? rawSerialNumber;
   final String? label;
