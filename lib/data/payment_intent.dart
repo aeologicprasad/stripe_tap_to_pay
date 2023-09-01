@@ -1,23 +1,21 @@
-import 'package:flutter/foundation.dart';
-
 class PaymentIntent {
-  final bool allowOffline;
-  final int amount;
-  final int amountCapturable;
-  final int amountReceived;
-  final String application;
-  final int applicationFeeAmount;
-  final int canceledAt;
-  final String cancellationReason;
-  final String captureMethod;
+  final bool? allowOffline;
+  final int? amount;
+  final int? amountCapturable;
+  final int? amountReceived;
+  final String? application;
+  final int? applicationFeeAmount;
+  final int? canceledAt;
+  final String? cancellationReason;
+  final String? captureMethod;
   final String? clientSecret;
   final String? confirmationMethod;
-  final int created;
+  final int? created;
   final String? currency;
   final String? customer;
   final String? description;
   final String? invoice;
-  final bool livemode;
+  final bool? livemode;
   final Map<String, String>? metadata;
   final String? onBehalfOf;
   final String? receiptEmail;
@@ -67,23 +65,23 @@ class PaymentIntent {
 
 PaymentIntent _$PaymentIntentFromJson(Map<String, dynamic> json) {
   return PaymentIntent(
-    allowOffline: json['allowOffline'] as bool,
-    amount: json['amount'] as int,
-    amountCapturable: json['amountCapturable'] as int,
-    amountReceived: json['amountReceived'] as int,
-    application: json['application'] as String,
-    applicationFeeAmount: json['applicationFeeAmount'] as int,
-    canceledAt: json['canceledAt'] as int,
-    cancellationReason: json['cancellationReason'] as String,
-    captureMethod: json['captureMethod'] as String,
+    allowOffline: json['allowOffline'] as bool?,
+    amount: json['amount'] as int?,
+    amountCapturable: json['amountCapturable'] as int?,
+    amountReceived: json['amountReceived'] as int?,
+    application: json['application'] as String?,
+    applicationFeeAmount: json['applicationFeeAmount'] as int?,
+    canceledAt: json['canceledAt'] as int?,
+    cancellationReason: json['cancellationReason'] as String?,
+    captureMethod: json['captureMethod'] as String?,
     clientSecret: json['clientSecret'] as String?,
     confirmationMethod: json['confirmationMethod'] as String?,
-    created: json['created'] as int,
+    created: json['created'] as int?,
     currency: json['currency'] as String?,
     customer: json['customer'] as String?,
     description: json['description'] as String?,
     invoice: json['invoice'] as String?,
-    livemode: json['livemode'] as bool,
+    livemode: json['livemode'] as bool?,
     metadata: json['metadata'] as Map<String, String>?,
     onBehalfOf: json['onBehalfOf'] as String?,
     receiptEmail: json['receiptEmail'] as String?,

@@ -71,8 +71,11 @@ android {
         implementation 'com.google.android.gms:play-services-location:16.0.0'
 
         // Stripe Terminal library
-        implementation "com.stripe:stripeterminal-localmobile:2.23.1"
-        implementation "com.stripe:stripeterminal-core:2.23.1"
+//        implementation "com.stripe:stripeterminal-localmobile:2.23.1"
+//        implementation "com.stripe:stripeterminal-core:2.23.1"
+
+        implementation "com.stripe:stripeterminal-localmobile:2.20.0"
+        implementation "com.stripe:stripeterminal-core:2.20.0"
 
 
         // OK HTTP

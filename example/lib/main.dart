@@ -56,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> connectReader() async {
     try {
       debugPrint("isTerminalInitialized: ${await _plugin.isReaderConnected()}");
-      final result = await _plugin.connectReader(isSimulated: true);
+      final result = await _plugin.connectReader(isSimulated: false);
       readerData = result.id ?? 'connected';
       debugPrint('Reader data: ${result.id}');
       setState(() {});
@@ -117,11 +117,11 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ElevatedButton(
-                onPressed: () {
-                  checkIsTerminalInitialized();
-                },
-                child: const Text('Is Terminal Initialized')),
+            // ElevatedButton(
+            //     onPressed: () {
+            //       checkIsTerminalInitialized();
+            //     },
+            //     child: const Text('Is Terminal Initialized')),
             ElevatedButton(
                 onPressed: () {
                   initializeTerminal();
