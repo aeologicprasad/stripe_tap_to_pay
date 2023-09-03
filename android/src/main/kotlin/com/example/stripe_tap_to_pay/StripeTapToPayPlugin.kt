@@ -51,13 +51,7 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         when (call.method) {
             "initializeStripeTerminal" -> {
                 BASE_URL = call.argument<String>("backendUrl")?:""
-                val myMap = mapOf(
-                    "status" to PaymentStatus.PAYMENT_SUCCESS.name,
-                    "data" to null,
-                )
-
-                result.success(Gson().toJson(myMap))
-//                stripeInitializer.setupTapToPay(activity!!, result)
+                stripeInitializer.setupTapToPay(activity!!, result)
             }
 
             "connectReader" -> {

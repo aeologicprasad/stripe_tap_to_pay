@@ -3,6 +3,7 @@ package com.example.stripe_tap_to_pay.stripe
 import android.util.Log
 import com.example.stripe_tap_to_pay.data.LocationListState
 import com.example.stripe_tap_to_pay.data.PaymentIntentCreationResponse
+import com.example.stripe_tap_to_pay.data.PaymentStatus
 import com.example.stripe_tap_to_pay.service.ApiClient
 import com.google.gson.Gson
 import com.stripe.stripeterminal.Terminal
@@ -259,7 +260,12 @@ class StripePaymentHandler {
 
             override fun onFailure(e: TerminalException) {
                 Log.e(TAG, e.errorMessage)
-                result?.success(null)
+                val paymentResult = mapOf<String, Any?>(
+                    "status" to PaymentStatus.PAYMENT_ERROR,
+                    "message" to e.errorMessage,
+                    "data" to null,
+                );
+                result?.success(gson.toJson(paymentResult))
             }
         }
     }
@@ -269,12 +275,22 @@ class StripePaymentHandler {
             override fun onSuccess(paymentIntent: PaymentIntent) {
                 ApiClient.capturePaymentIntent(paymentIntent.id)
                 Log.d(TAG, "Payment Successful: ${paymentIntent.id}")
-                result?.success(gson.toJson(paymentIntent))
+                val paymentResult = mapOf<String, Any?>(
+                    "status" to PaymentStatus.PAYMENT_SUCCESS,
+                    "message" to "Payment Successful",
+                    "data" to paymentIntent,
+                );
+                result?.success(gson.toJson(paymentResult))
             }
 
             override fun onFailure(e: TerminalException) {
                 Log.e(TAG, e.errorMessage)
-                result?.success(null)
+                val paymentResult = mapOf<String, Any?>(
+                    "status" to PaymentStatus.PAYMENT_ERROR,
+                    "message" to e.errorMessage,
+                    "data" to null,
+                );
+                result?.success(gson.toJson(paymentResult))
             }
         }
     }
