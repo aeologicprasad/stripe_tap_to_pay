@@ -9,9 +9,11 @@ import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.example.stripe_tap_to_pay.data.PaymentStatus
 import com.example.stripe_tap_to_pay.service.BASE_URL
 import com.example.stripe_tap_to_pay.stripe.StripeInitializer
 import com.example.stripe_tap_to_pay.stripe.StripePaymentHandler
+import com.google.gson.Gson
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -49,7 +51,13 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         when (call.method) {
             "initializeStripeTerminal" -> {
                 BASE_URL = call.argument<String>("backendUrl")?:""
-                stripeInitializer.setupTapToPay(activity!!, result)
+                val myMap = mapOf(
+                    "status" to PaymentStatus.PAYMENT_SUCCESS.name,
+                    "data" to null,
+                )
+
+                result.success(Gson().toJson(myMap))
+//                stripeInitializer.setupTapToPay(activity!!, result)
             }
 
             "connectReader" -> {

@@ -32,8 +32,9 @@ class StripeTapToPay {
     bool skipTipping = true,
     bool extendedAuth = false,
     bool incrementalAuth = false,
-    required Function(PaymentIntent) onPaymentSuccess,
-    required Function() onPaymentError,
+    required Function(PaymentIntent? paymentIntent) onPaymentSuccess,
+    required Function(String? errorMessage) onPaymentError,
+    required Function() onPaymentCancelled,
   }) {
     return StripeTapToPayPlatform.instance.createPayment(amount,
         currency: currency,
@@ -41,6 +42,7 @@ class StripeTapToPay {
         extendedAuth: extendedAuth,
         incrementalAuth: incrementalAuth,
         onPaymentSuccess: onPaymentSuccess,
-        onPaymentError: onPaymentError);
+        onPaymentError: onPaymentError,
+        onPaymentCancelled: onPaymentCancelled);
   }
 }

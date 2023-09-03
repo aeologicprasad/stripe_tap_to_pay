@@ -70,11 +70,14 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       await _plugin.createPayment(
         100,
-        onPaymentSuccess: (PaymentIntent intent) {
-          debugPrint('Payment success callback: ${intent.stripeAccountId}');
+        onPaymentSuccess: (PaymentIntent? intent) {
+          debugPrint('Payment success callback: ${intent?.stripeAccountId}');
         },
-        onPaymentError: () {
-          debugPrint('Payment failed callback');
+        onPaymentError: (String? errorMessage) {
+          debugPrint('onPaymentError callback: $errorMessage');
+        },
+        onPaymentCancelled: () {
+          debugPrint('onPaymentCancelled callback');
         },
       );
       setState(() {});

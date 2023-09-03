@@ -8,9 +8,6 @@ class MockStripeTapToPayPlatform
     with MockPlatformInterfaceMixin
     implements StripeTapToPayPlatform {
   @override
-  Future<String?> getPlatformVersion() => Future.value('42');
-
-  @override
   Future<Reader> connectReader({required bool isSimulated}) {
     // TODO: implement connectReader
     throw UnimplementedError();
@@ -19,20 +16,6 @@ class MockStripeTapToPayPlatform
   @override
   Future<bool> initializeStripeTerminal({required String backendUrl}) {
     // TODO: implement initializeStripeTerminal
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<PaymentIntent> createPayment(
-    int amount, {
-    String currency = 'USD',
-    bool skipTipping = true,
-    bool extendedAuth = false,
-    bool incrementalAuth = false,
-    required Function(PaymentIntent) onPaymentSuccess,
-    required Function() onPaymentError,
-  }) {
-    // TODO: implement createPayment
     throw UnimplementedError();
   }
 
@@ -51,6 +34,19 @@ class MockStripeTapToPayPlatform
   @override
   Future<bool> isReaderConnected() {
     // TODO: implement disconnectReader
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> createPayment(int amount,
+      {String currency = 'usd',
+      bool skipTipping = true,
+      bool extendedAuth = false,
+      bool incrementalAuth = false,
+      required Function(PaymentIntent? paymentIntent) onPaymentSuccess,
+      required Function(String? errorMessage) onPaymentError,
+      required Function() onPaymentCancelled}) {
+    // TODO: implement createPayment
     throw UnimplementedError();
   }
 }

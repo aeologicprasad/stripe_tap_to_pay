@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:stripe_tap_to_pay/data/PaymentResult.dart';
 import 'package:stripe_tap_to_pay/data/payment_intent.dart';
+import 'package:stripe_tap_to_pay/data/payment_status.dart';
 import 'package:stripe_tap_to_pay/data/reader.dart';
 
 import 'stripe_tap_to_pay_platform_interface.dart';
@@ -52,8 +54,9 @@ class MethodChannelStripeTapToPay extends StripeTapToPayPlatform {
     bool skipTipping = true,
     bool extendedAuth = false,
     bool incrementalAuth = false,
-    required Function(PaymentIntent) onPaymentSuccess,
-    required Function() onPaymentError,
+    required Function(PaymentIntent? paymentIntent) onPaymentSuccess,
+    required Function(String? errorMessage) onPaymentError,
+    required Function() onPaymentCancelled,
   }) async {
     final data = {
       'amount': amount,
@@ -63,12 +66,14 @@ class MethodChannelStripeTapToPay extends StripeTapToPayPlatform {
       'incrementalAuth': incrementalAuth,
     };
     final result = await methodChannel.invokeMethod('createPayment', data);
-    PaymentIntent? intent;
-    if (result != null) {
-      intent = PaymentIntent.fromJson(json.decode(result ?? '{}'));
-      onPaymentSuccess(intent);
+    PaymentResult paymentResult =
+        PaymentResult.fromJson(json.decode(result ?? '{}'));
+    if (paymentResult.status == PaymentStatus.PAYMENT_SUCCESS) {
+      onPaymentSuccess(paymentResult.data);
+    } else if (paymentResult.status == PaymentStatus.PAYMENT_SUCCESS) {
+      onPaymentError(paymentResult.message);
     } else {
-      onPaymentError();
+      onPaymentCancelled();
     }
   }
 }
