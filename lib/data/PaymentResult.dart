@@ -15,12 +15,13 @@ class PaymentResult {
   factory PaymentResult.fromJson(Map<String, dynamic> json) => PaymentResult(
         status: json["status"]?.toString().paymentStatus(),
         message: json["message"],
-        data: json["data"],
+        data:
+            json["data"] != null ? PaymentIntent.fromJson(json['data']) : null,
       );
 
   Map<String, dynamic> toJson() => {
         "status": status,
         "message": message,
-        "data": data,
+        "data": data?.toJson(),
       };
 }

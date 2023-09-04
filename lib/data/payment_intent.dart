@@ -16,7 +16,7 @@ class PaymentIntent {
   final String? description;
   final String? invoice;
   final bool? livemode;
-  final Map<String, String>? metadata;
+  // final Map<String, String>? metadata;
   final String? onBehalfOf;
   final String? receiptEmail;
   final String? review;
@@ -45,7 +45,7 @@ class PaymentIntent {
     required this.description,
     required this.invoice,
     required this.livemode,
-    required this.metadata,
+    // required this.metadata,
     required this.onBehalfOf,
     required this.receiptEmail,
     required this.review,
@@ -65,33 +65,33 @@ class PaymentIntent {
 
 PaymentIntent _$PaymentIntentFromJson(Map<String, dynamic> json) {
   return PaymentIntent(
-    allowOffline: json['allowOffline'] as bool?,
-    amount: json['amount'] as int?,
-    amountCapturable: json['amountCapturable'] as int?,
-    amountReceived: json['amountReceived'] as int?,
-    application: json['application'] as String?,
-    applicationFeeAmount: json['applicationFeeAmount'] as int?,
-    canceledAt: json['canceledAt'] as int?,
-    cancellationReason: json['cancellationReason'] as String?,
-    captureMethod: json['captureMethod'] as String?,
-    clientSecret: json['clientSecret'] as String?,
-    confirmationMethod: json['confirmationMethod'] as String?,
-    created: json['created'] as int?,
-    currency: json['currency'] as String?,
-    customer: json['customer'] as String?,
-    description: json['description'] as String?,
-    invoice: json['invoice'] as String?,
+    allowOffline: json['allowOffline'],
+    amount: json['amount'],
+    amountCapturable: json['amountCapturable'],
+    amountReceived: json['amountReceived'],
+    application: json['application'],
+    applicationFeeAmount: json['applicationFeeAmount'],
+    canceledAt: json['canceledAt'],
+    cancellationReason: json['cancellationReason'],
+    captureMethod: json['captureMethod'],
+    clientSecret: json['clientSecret'],
+    confirmationMethod: json['confirmationMethod'],
+    created: json['created'],
+    currency: json['currency'],
+    customer: json['customer'],
+    description: json['description'],
+    invoice: json['invoice'],
     livemode: json['livemode'] as bool?,
-    metadata: json['metadata'] as Map<String, String>?,
-    onBehalfOf: json['onBehalfOf'] as String?,
-    receiptEmail: json['receiptEmail'] as String?,
-    review: json['review'] as String?,
-    setupFutureUsage: json['setupFutureUsage'] as String?,
-    statementDescriptor: json['statementDescriptor'] as String?,
-    transferGroup: json['transferGroup'] as String?,
-    amountTip: json['amountTip'] as int?,
-    statementDescriptorSuffix: json['statementDescriptorSuffix'] as String?,
-    stripeAccountId: json['stripeAccountId'] as String?,
+    // metadata: json['metadata'],
+    onBehalfOf: json['onBehalfOf'],
+    receiptEmail: json['receiptEmail'],
+    review: json['review'],
+    setupFutureUsage: json['setupFutureUsage'],
+    statementDescriptor: json['statementDescriptor'],
+    transferGroup: json['transferGroup'],
+    amountTip: json['amountTip'],
+    statementDescriptorSuffix: json['statementDescriptorSuffix'],
+    stripeAccountId: json['stripeAccountId'],
   );
 }
 
@@ -114,7 +114,7 @@ Map<String, dynamic> _$PaymentIntentToJson(PaymentIntent instance) =>
       'description': instance.description,
       'invoice': instance.invoice,
       'livemode': instance.livemode,
-      'metadata': instance.metadata,
+      // 'metadata': instance.metadata,
       'onBehalfOf': instance.onBehalfOf,
       'receiptEmail': instance.receiptEmail,
       'review': instance.review,
