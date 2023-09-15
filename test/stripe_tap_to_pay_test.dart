@@ -14,12 +14,6 @@ class MockStripeTapToPayPlatform
   }
 
   @override
-  Future<bool> initializeStripeTerminal({required String backendUrl}) {
-    // TODO: implement initializeStripeTerminal
-    throw UnimplementedError();
-  }
-
-  @override
   Future<bool> disconnectReader() {
     // TODO: implement disconnectReader
     throw UnimplementedError();
@@ -38,15 +32,19 @@ class MockStripeTapToPayPlatform
   }
 
   @override
-  Future<void> createPayment(int amount,
-      {String currency = 'usd',
+  Future<void> createPayment(
+      {required String secret,
       bool skipTipping = true,
-      bool extendedAuth = false,
-      bool incrementalAuth = false,
       required Function(PaymentIntent? paymentIntent) onPaymentSuccess,
       required Function(String? errorMessage) onPaymentError,
       required Function() onPaymentCancelled}) {
     // TODO: implement createPayment
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<bool> initializeStripeTerminal({required String token}) {
+    // TODO: implement initializeStripeTerminal
     throw UnimplementedError();
   }
 }

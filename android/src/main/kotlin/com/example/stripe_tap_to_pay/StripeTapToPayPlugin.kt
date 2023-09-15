@@ -4,80 +4,71 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import com.example.stripe_tap_to_pay.data.PaymentStatus
-import com.example.stripe_tap_to_pay.service.BASE_URL
-import com.example.stripe_tap_to_pay.stripe.StripeInitializer
-import com.example.stripe_tap_to_pay.stripe.StripePaymentHandler
-import com.google.gson.Gson
+import com.example.stripe_tap_to_pay.logic.PermissionHandler
+import com.example.stripe_tap_to_pay.logic.StripeTerminal
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference
+import io.flutter.plugin.common.PluginRegistry
 
-/** StripeTapToPayPlugin */
-class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
+@Suppress("KotlinConstantConditions")
+class StripeTapToPayPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, ActivityAware,
     PluginRegistry.RequestPermissionsResultListener, PluginRegistry.ActivityResultListener {
-    /// The MethodChannel that will the communication between Flutter and native Android
-    ///
-    /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-    /// when the Flutter Engine is detached from the Activity
+
     private lateinit var channel: MethodChannel
     private var activity: Activity? = null
     private var context: Context? = null
-    private val TAG = "StripeTapToPayPlugin"
-    private val stripeInitializer = StripeInitializer();
-    private val paymentHandler = StripePaymentHandler()
-    private var previousEvent: Lifecycle.Event? = null
     private var result: MethodChannel.Result? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        context = flutterPluginBinding.applicationContext  // Store the application context
+        context = flutterPluginBinding.applicationContext
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, "stripe_tap_to_pay")
         channel.setMethodCallHandler(this)
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        this.activity?.let {
+            StripeTerminal.activity = it
+            PermissionHandler.activity = it
+        }
         this.result = result
+        StripeTerminal.result = result;
+        PermissionHandler.result = result
+
         when (call.method) {
             "initializeStripeTerminal" -> {
-                BASE_URL = call.argument<String>("backendUrl")?:""
-                stripeInitializer.setupTapToPay(activity!!, result)
+                val token = call.argument<String>("token") ?: ""
+                StripeTerminal.token = token
+                StripeTerminal.setupTapToPay()
             }
 
             "connectReader" -> {
-                val isSimulated = call.argument<Boolean>("isSimulated")?:false
-                paymentHandler.connectReader(isSimulated, result)
+                val isSimulated = call.argument<Boolean>("isSimulated") ?: false
+                StripeTerminal.connectReader(isSimulated)
             }
 
             "disconnectReader" -> {
-                paymentHandler.disconnectReader(result)
+                StripeTerminal.disconnectReader()
             }
 
             "isTerminalInitialized" -> {
-                paymentHandler.isTerminalInitialized(result)
+                StripeTerminal.isTerminalInitialized()
             }
 
             "isReaderConnected" -> {
-                paymentHandler.isReaderConnected(result)
+                StripeTerminal.isReaderConnected()
             }
 
             "createPayment" -> {
-                val amount: Long = ((call.argument<Int>("amount") ?: 1)*100).toLong()
-                val currency = call.argument<String>("currency")?:"usd"
-                val skipTipping = call.argument<Boolean>("skipTipping")?:true
-                val extendedAuth = call.argument<Boolean>("extendedAuth")?:false
-                val incrementalAuth = call.argument<Boolean>("incrementalAuth")?:false
-                paymentHandler.createPaymentIntent(amount, currency, skipTipping, extendedAuth, incrementalAuth, result)
+                val secret = call.argument<String>("secret") ?: ""
+                val skipTipping = call.argument<Boolean>("skipTipping") ?: true
+
+                StripeTerminal.createPaymentIntent(secret, skipTipping)
             }
 
             else -> {
@@ -86,7 +77,7 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         }
     }
 
-    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
     }
 
@@ -95,19 +86,6 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
         activity = binding.activity
         binding.addRequestPermissionsResultListener(this)
         binding.addActivityResultListener(this)
-//        (binding.lifecycle as HiddenLifecycleReference)
-//            .lifecycle
-//            .addObserver(LifecycleEventObserver { _, event ->
-//                Log.d(TAG, "$event")
-//                if (!stripeInitializer.gpsDialogActive && previousEvent == Lifecycle.Event.ON_PAUSE && event == Lifecycle.Event.ON_RESUME) {
-//                    Log.d(TAG, "Re-initializing Stripe Terminal...")
-//                    CoroutineScope(Dispatchers.Main).launch {
-//                        stripeInitializer.initializeTerminal(activity!!, result!!)
-//                        stripeInitializer.gpsDialogActive = false
-//                    }
-//                }
-//                previousEvent = event
-//            })
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
@@ -116,45 +94,36 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodCallHandler, ActivityAware,
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        Log.d(TAG, "onReattachedToActivityForConfigChanges: $binding");
         activity = binding.activity
         binding.addRequestPermissionsResultListener(this)
         binding.addActivityResultListener(this)
-        stripeInitializer.setupTapToPay(activity!!, result!!)
+        StripeTerminal.setupTapToPay()
     }
 
     override fun onDetachedFromActivity() {
         activity = null
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        Log.d(TAG, "onActivityResult: $requestCode, $resultCode, $data");
-        if(requestCode==102 && resultCode==-1){
+        if (requestCode == 102 && resultCode == Activity.RESULT_OK) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                stripeInitializer.initializeTerminal(activity!!, result!!)
+                StripeTerminal.initializeTerminal()
             }
-        }else if (requestCode==102 && resultCode==0){
+        } else if (requestCode == 102 && resultCode == Activity.RESULT_CANCELED) {
             result?.error("location_service_error", "Location service must be enabled for tap to pay feature", null)
         }
         return true
     }
 
-
     @RequiresApi(Build.VERSION_CODES.S)
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ): Boolean {
-        Log.d(TAG, "onRequestPermissionsResult: $requestCode, ${permissions.joinToString(" ")}, ${grantResults.joinToString(" ")}");
-        if(requestCode==101 && grantResults.contains(-1)){
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray): Boolean {
+        if (requestCode == 101 && grantResults.contains(-1)) {
             result?.error("permission_request_error", "Permissions required to continue with tap to pay feature", null)
             return false
-        }else if(requestCode==101){
-            stripeInitializer.setupTapToPay(activity!!, result!!)
+        } else if (requestCode == 101) {
+            StripeTerminal.setupTapToPay()
             return true
         }
-        return true;
+        return true
     }
 }

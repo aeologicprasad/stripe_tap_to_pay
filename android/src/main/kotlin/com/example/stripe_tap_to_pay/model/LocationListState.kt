@@ -1,4 +1,4 @@
-package com.example.stripe_tap_to_pay.data
+package com.example.stripe_tap_to_pay.model
 
 import com.stripe.stripeterminal.external.models.Location
 

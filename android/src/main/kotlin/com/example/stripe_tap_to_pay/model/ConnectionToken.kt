@@ -1,4 +1,4 @@
-package com.example.stripe_tap_to_pay.data
+package com.example.stripe_tap_to_pay.model
 /**
  * A one-field data class used to handle the connection token response from our backend
  */

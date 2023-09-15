@@ -4,9 +4,9 @@ import 'data/reader.dart';
 import 'stripe_tap_to_pay_platform_interface.dart';
 
 class StripeTapToPay {
-  Future<bool> initializeStripeTerminal({required String backendUrl}) {
+  Future<bool> initializeStripeTerminal({required String token}) {
     return StripeTapToPayPlatform.instance
-        .initializeStripeTerminal(backendUrl: backendUrl);
+        .initializeStripeTerminal(token: token);
   }
 
   Future<Reader> connectReader({bool isSimulated = false}) {
@@ -26,23 +26,19 @@ class StripeTapToPay {
     return StripeTapToPayPlatform.instance.isReaderConnected();
   }
 
-  Future<void> createPayment(
-    int amount, {
-    String currency = 'usd',
+  Future<void> createPayment({
+    required String secret,
     bool skipTipping = true,
-    bool extendedAuth = false,
-    bool incrementalAuth = false,
     required Function(PaymentIntent? paymentIntent) onPaymentSuccess,
     required Function(String? errorMessage) onPaymentError,
     required Function() onPaymentCancelled,
   }) {
-    return StripeTapToPayPlatform.instance.createPayment(amount,
-        currency: currency,
-        skipTipping: skipTipping,
-        extendedAuth: extendedAuth,
-        incrementalAuth: incrementalAuth,
-        onPaymentSuccess: onPaymentSuccess,
-        onPaymentError: onPaymentError,
-        onPaymentCancelled: onPaymentCancelled);
+    return StripeTapToPayPlatform.instance.createPayment(
+      secret: secret,
+      skipTipping: skipTipping,
+      onPaymentSuccess: onPaymentSuccess,
+      onPaymentError: onPaymentError,
+      onPaymentCancelled: onPaymentCancelled,
+    );
   }
 }

@@ -16,9 +16,9 @@ class MethodChannelStripeTapToPay extends StripeTapToPayPlatform {
   final methodChannel = const MethodChannel('stripe_tap_to_pay');
 
   @override
-  Future<bool> initializeStripeTerminal({required String backendUrl}) async {
-    final result = await methodChannel.invokeMethod<bool?>(
-        'initializeStripeTerminal', {'backendUrl': backendUrl});
+  Future<bool> initializeStripeTerminal({required String token}) async {
+    final result = await methodChannel
+        .invokeMethod<bool?>('initializeStripeTerminal', {'token': token});
     return result ?? false;
   }
 
@@ -48,22 +48,16 @@ class MethodChannelStripeTapToPay extends StripeTapToPayPlatform {
   }
 
   @override
-  Future<void> createPayment(
-    int amount, {
-    String currency = 'usd',
+  Future<void> createPayment({
+    required String secret,
     bool skipTipping = true,
-    bool extendedAuth = false,
-    bool incrementalAuth = false,
     required Function(PaymentIntent? paymentIntent) onPaymentSuccess,
     required Function(String? errorMessage) onPaymentError,
     required Function() onPaymentCancelled,
   }) async {
     final data = {
-      'amount': amount,
-      'currency': currency,
+      'secret': secret,
       'skipTipping': skipTipping,
-      'extendedAuth': extendedAuth,
-      'incrementalAuth': incrementalAuth,
     };
     final result = await methodChannel.invokeMethod('createPayment', data);
     PaymentResult paymentResult =

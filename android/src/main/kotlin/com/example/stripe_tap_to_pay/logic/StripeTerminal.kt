@@ -1,10 +1,14 @@
-package com.example.stripe_tap_to_pay.stripe
+package com.example.stripe_tap_to_pay.logic
 
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.os.Build
 import android.util.Log
-import com.example.stripe_tap_to_pay.data.LocationListState
-import com.example.stripe_tap_to_pay.data.PaymentIntentCreationResponse
-import com.example.stripe_tap_to_pay.data.PaymentStatus
-import com.example.stripe_tap_to_pay.service.ApiClient
+import androidx.annotation.RequiresApi
+import com.example.stripe_tap_to_pay.enum.PaymentStatus
+import com.example.stripe_tap_to_pay.model.LocationListState
+import com.example.stripe_tap_to_pay.provider.TerminalEventListener
+import com.example.stripe_tap_to_pay.provider.TokenProvider
 import com.google.gson.Gson
 import com.stripe.stripeterminal.Terminal
 import com.stripe.stripeterminal.external.callable.Callback
@@ -20,22 +24,53 @@ import com.stripe.stripeterminal.external.models.ListLocationsParameters
 import com.stripe.stripeterminal.external.models.Location
 import com.stripe.stripeterminal.external.models.PaymentIntent
 import com.stripe.stripeterminal.external.models.Reader
+
 import com.stripe.stripeterminal.external.models.TerminalException
+import com.stripe.stripeterminal.log.LogLevel
 import kotlinx.coroutines.flow.MutableStateFlow
-import retrofit2.Call
-import retrofit2.Response
 import io.flutter.plugin.common.MethodChannel
 
-class StripePaymentHandler {
-    private val TAG = "StripeTapToPayPlugin"
+@SuppressLint("StaticFieldLeak")
+object StripeTerminal {
+    private const val TAG = "StripeTapToPayPlugin"
+
+    // Class members for secret, activity, and result
+    var token: String? = null
+    var activity: Activity? = null
+    var result: MethodChannel.Result? = null
+
     private var SKIP_TIPPING = false
-    private var result: MethodChannel.Result? = null
     private val gson = Gson()
     private val locationsList = MutableStateFlow(LocationListState())
     private var isSimulated = false
 
-    fun connectReader(isSimulated: Boolean, result: MethodChannel.Result) {
-        this.result = result
+    @RequiresApi(Build.VERSION_CODES.S)
+    fun setupTapToPay() {
+        PermissionHandler.startPermissionFlow()
+    }
+
+    fun initializeTerminal() {
+        if (!Terminal.isInitialized()) {
+            try {
+                Log.d(TAG, "Initializing Stripe Terminal...")
+                Terminal.initTerminal(
+                    activity!!, LogLevel.VERBOSE, TokenProvider(token.orEmpty()),
+                    TerminalEventListener()
+                )
+                Log.d(TAG, "Stripe Terminal Initialized Successfully")
+                result?.success(true)
+            } catch (e: TerminalException) {
+                Log.e(TAG, "Stripe Terminal Initialization Error: ${e.errorMessage}")
+                result?.error("stripe_terminal_error", e.errorMessage, null)
+            }
+        } else {
+            Log.d(TAG, "Stripe Terminal is already Initialized")
+            result?.success(true)
+        }
+    }
+
+
+    fun connectReader(isSimulated: Boolean) {
         this.isSimulated = isSimulated
         if (locationsList.value.locations.isEmpty()) {
             loadLocations()
@@ -44,25 +79,6 @@ class StripePaymentHandler {
         }
     }
 
-    // Location callback : for loading locations using stripe terminal
-    private val locationCallback = object : LocationListCallback {
-        override fun onFailure(e: TerminalException) {
-            Log.e(TAG, "Failed to load reader locations: ${e.errorMessage}")
-            result?.error("fetch_reader_error", e.errorMessage, null)
-        }
-
-        override fun onSuccess(locations: List<Location>, hasMore: Boolean) {
-            locationsList.value = locationsList.value.let {
-                it.copy(
-                    locations = it.locations + locations,
-                    hasMore = hasMore,
-                    isLoading = false,
-                )
-            }
-
-            discoverReaders()
-        }
-    }
 
     private fun loadLocations() {
         Log.d(TAG, "Loading Reader locations...")
@@ -71,52 +87,64 @@ class StripePaymentHandler {
             ListLocationsParameters.Builder().apply {
                 limit = 100
             }.build(),
-            locationCallback
+            callback = object : LocationListCallback {
+                override fun onFailure(e: TerminalException) {
+                    Log.e(TAG, "Failed to load reader locations: ${e.errorMessage}")
+                    result?.error("fetch_reader_error", e.errorMessage, null)
+                }
+
+                override fun onSuccess(locations: List<Location>, hasMore: Boolean) {
+                    locationsList.value = locationsList.value.let {
+                        it.copy(
+                            locations = it.locations + locations,
+                            hasMore = hasMore,
+                            isLoading = false,
+                        )
+                    }
+
+                    discoverReaders()
+                }
+            }
         )
     }
 
 
-
-    fun disconnectReader(result: MethodChannel.Result) {
-
-        if(!Terminal.isInitialized()){
-            result.success(false);
-            return;
+    fun disconnectReader() {
+        if (!Terminal.isInitialized()) {
+            result?.success(false)
+            return
         }
 
-        Terminal.getInstance().disconnectReader(callback = object : Callback{
+        Terminal.getInstance().disconnectReader(callback = object : Callback {
             override fun onFailure(e: TerminalException) {
                 Log.e(TAG, "${e.message}")
-                result.error("reader_error", "${e.message}", null);
+                result?.error("reader_error", "${e.message}", null)
             }
 
             override fun onSuccess() {
                 Log.d(TAG, "Reader Disconnected")
-                result.success(true);
+                result?.success(true)
             }
-
-        });
+        })
     }
-
-
 
 
     // Check if terminal connected
-    fun isTerminalInitialized(result: MethodChannel.Result){
-         result.success(Terminal.isInitialized());
+    fun isTerminalInitialized() {
+        result?.success(Terminal.isInitialized())
     }
 
     // Check if reader connected or not
-    fun isReaderConnected(result: MethodChannel.Result){
-        try{
-            if(!Terminal.isInitialized()){
-                result.success(false);
-                return;
+    fun isReaderConnected() {
+        try {
+            if (!Terminal.isInitialized()) {
+                result?.success(false)
+                return
             }
-            val isConnected = Terminal.getInstance().connectedReader!=null;
-            result.success(isConnected);
-        }catch (e: Exception){
-            result.error("terminal_error", "${e.message}", null);
+            val isConnected = Terminal.getInstance().connectedReader != null
+            result?.success(isConnected)
+        } catch (e: Exception) {
+            result?.error("terminal_error", "${e.message}", null)
         }
     }
 
@@ -168,6 +196,20 @@ class StripePaymentHandler {
         })
     }
 
+    fun createPaymentIntent(
+        secret: String,
+        skipTipping: Boolean,
+    ) {
+        Log.d(TAG, "Creating Stripe Payment Intent...")
+        SKIP_TIPPING = skipTipping
+
+        Terminal.getInstance().retrievePaymentIntent(
+            secret,
+            createPaymentIntentCallback
+        )
+    }
+
+
     private val createPaymentIntentCallback by lazy {
         object : PaymentIntentCallback {
             override fun onSuccess(paymentIntent: PaymentIntent) {
@@ -192,65 +234,6 @@ class StripePaymentHandler {
         }
     }
 
-    fun createPaymentIntent(
-        amount: Long,
-        currency: String,
-        skipTipping: Boolean,
-        extendedAuth: Boolean,
-        incrementalAuth: Boolean,
-        result: MethodChannel.Result
-    ) {
-        Log.d(TAG, "Creating Stripe Payment Intent...")
-        this.result = result
-        SKIP_TIPPING = skipTipping
-
-        ApiClient.createPaymentIntent(
-            amount,
-            currency,
-            extendedAuth,
-            incrementalAuth,
-            callback = object : retrofit2.Callback<PaymentIntentCreationResponse> {
-                override fun onResponse(
-                    call: Call<PaymentIntentCreationResponse>,
-                    response: Response<PaymentIntentCreationResponse>
-                ) {
-                    if (response.isSuccessful && response.body() != null) {
-                        Terminal.getInstance().retrievePaymentIntent(
-                            response.body()?.secret!!,
-                            createPaymentIntentCallback
-                        )
-                    }
-                    else {
-                        if(response.body()==null){
-                            Log.e(TAG, "Failed to get secrete key from server")
-                            result?.error(
-                                "secret_key_error",
-                                "Failed to get secrete key from server",
-                                null
-                            )
-                        }else{
-                            Log.e(TAG, "${response.body()}")
-                            result?.error(
-                                "secret_key_error",
-                                "${response.body()}",
-                                null
-                            )
-                        }
-
-                    }
-                }
-
-                override fun onFailure(
-                    call: Call<PaymentIntentCreationResponse>,
-                    t: Throwable
-                ) {
-                    Log.e(TAG, "${t.message}")
-                    result?.error("secret_key_error", t.message, null)
-                }
-            }
-        )
-    }
-
     private val collectPaymentMethodCallback by lazy {
         object : PaymentIntentCallback {
             override fun onSuccess(paymentIntent: PaymentIntent) {
@@ -261,10 +244,10 @@ class StripePaymentHandler {
             override fun onFailure(e: TerminalException) {
                 Log.e(TAG, e.errorMessage)
                 val paymentResult = mapOf<String, Any?>(
-                    "status" to PaymentStatus.PAYMENT_ERROR,
+                    "status" to com.example.stripe_tap_to_pay.enum.PaymentStatus.PAYMENT_ERROR,
                     "message" to e.errorMessage,
                     "data" to null,
-                );
+                )
                 result?.success(gson.toJson(paymentResult))
             }
         }
@@ -273,13 +256,13 @@ class StripePaymentHandler {
     private val processPaymentCallback by lazy {
         object : PaymentIntentCallback {
             override fun onSuccess(paymentIntent: PaymentIntent) {
-                ApiClient.capturePaymentIntent(paymentIntent.id)
+//                ApiClient.capturePaymentIntent(paymentIntent.id)
                 Log.d(TAG, "Payment Successful: ${paymentIntent.id}")
                 val paymentResult = mapOf<String, Any?>(
                     "status" to PaymentStatus.PAYMENT_SUCCESS,
                     "message" to "Payment Successful",
                     "data" to paymentIntent,
-                );
+                )
                 result?.success(gson.toJson(paymentResult))
             }
 
@@ -289,9 +272,11 @@ class StripePaymentHandler {
                     "status" to PaymentStatus.PAYMENT_ERROR,
                     "message" to e.errorMessage,
                     "data" to null,
-                );
+                )
                 result?.success(gson.toJson(paymentResult))
             }
         }
     }
+
+
 }

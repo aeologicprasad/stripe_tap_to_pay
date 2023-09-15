@@ -1,4 +1,4 @@
-package com.example.stripe_tap_to_pay.stripe
+package com.example.stripe_tap_to_pay.provider
 
 import android.util.Log
 import com.stripe.stripeterminal.external.callable.TerminalListener

@@ -6,6 +6,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:stripe_tap_to_pay/data/payment_intent.dart';
 import 'package:stripe_tap_to_pay/stripe_tap_to_pay.dart';
 
+import 'http/api_client.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -38,51 +40,56 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _plugin = StripeTapToPay();
+  final apiClient =
+      ApiClient('https://example-terminal-backend-g42p.onrender.com');
+
   bool isTerminalInitialized = false;
   String? readerData;
   Future<void> initializeTerminal() async {
-    try {
-      final result = await _plugin.initializeStripeTerminal(
-          backendUrl: 'https://example-terminal-backend-g42p.onrender.com/');
-      debugPrint("Terminal Result: $result");
-      isTerminalInitialized = result;
-      setState(() {});
-    } on PlatformException catch (e) {
-      // debugPrint('$e');
-      Fluttertoast.showToast(msg: e.message ?? 'Error occurred');
-    }
+    apiClient.post('/connection_token').then((value) async {
+      try {
+        final result =
+            await _plugin.initializeStripeTerminal(token: value['secret']);
+        debugPrint("Terminal Result: $result");
+      } on PlatformException catch (e) {
+        debugPrint('$e');
+        Fluttertoast.showToast(msg: e.message ?? 'Error occurred');
+      }
+    }).onError((error, stackTrace) {
+      debugPrint('$error');
+      Fluttertoast.showToast(msg: error?.toString() ?? 'Error occurred');
+    });
   }
 
   Future<void> connectReader() async {
     try {
-      debugPrint("isTerminalInitialized: ${await _plugin.isReaderConnected()}");
       final result = await _plugin.connectReader(isSimulated: true);
       readerData = result.id ?? 'connected';
       debugPrint('Reader data: ${result.id}');
-      setState(() {});
     } on PlatformException catch (e) {
-      // debugPrint('Error: $e');
+      debugPrint('Error: $e');
       Fluttertoast.showToast(msg: e.message ?? 'Error occurred');
     }
   }
 
   Future<void> createPayment() async {
     try {
-      await _plugin.createPayment(
-        100,
-        onPaymentSuccess: (PaymentIntent? intent) {
-          debugPrint('Payment success callback: ${intent?.stripeAccountId}');
-        },
-        onPaymentError: (String? errorMessage) {
-          debugPrint('onPaymentError callback: $errorMessage');
-        },
-        onPaymentCancelled: () {
-          debugPrint('onPaymentCancelled callback');
-        },
-      );
-      setState(() {});
+      apiClient.post('create_payment_intent?amount=100').then((value) async {
+        await _plugin.createPayment(
+          secret: value['secret'],
+          onPaymentSuccess: (PaymentIntent? intent) {
+            debugPrint('Payment success callback: ${intent?.stripeAccountId}');
+          },
+          onPaymentError: (String? errorMessage) {
+            debugPrint('onPaymentError callback: $errorMessage');
+          },
+          onPaymentCancelled: () {
+            debugPrint('onPaymentCancelled callback');
+          },
+        );
+      }).onError((error, stackTrace) => null);
     } on PlatformException catch (e) {
-      // debugPrint('Error: $e');
+      debugPrint('Error: $e');
       Fluttertoast.showToast(msg: e.message ?? 'Error occurred');
     }
   }
@@ -120,11 +127,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // ElevatedButton(
-            //     onPressed: () {
-            //       checkIsTerminalInitialized();
-            //     },
-            //     child: const Text('Is Terminal Initialized')),
             ElevatedButton(
                 onPressed: () {
                   initializeTerminal();

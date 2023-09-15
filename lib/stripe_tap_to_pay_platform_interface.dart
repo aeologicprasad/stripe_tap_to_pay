@@ -25,7 +25,7 @@ abstract class StripeTapToPayPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<bool> initializeStripeTerminal({required String backendUrl}) {
+  Future<bool> initializeStripeTerminal({required String token}) {
     throw UnimplementedError(
         'initializeStripeTerminal() has not been implemented.');
   }
@@ -34,12 +34,9 @@ abstract class StripeTapToPayPlatform extends PlatformInterface {
     throw UnimplementedError('connectReader() has not been implemented.');
   }
 
-  Future<void> createPayment(
-    int amount, {
-    String currency = 'usd',
+  Future<void> createPayment({
+    required String secret,
     bool skipTipping = true,
-    bool extendedAuth = false,
-    bool incrementalAuth = false,
     required Function(PaymentIntent? paymentIntent) onPaymentSuccess,
     required Function(String? errorMessage) onPaymentError,
     required Function() onPaymentCancelled,

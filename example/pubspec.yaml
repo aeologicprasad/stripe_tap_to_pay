@@ -16,7 +16,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  http: ^1.1.0
   stripe_tap_to_pay:
     # When depending on this package from a real application you should use:
     #   stripe_tap_to_pay: ^x.y.z
