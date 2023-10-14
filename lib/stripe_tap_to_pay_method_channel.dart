@@ -64,7 +64,7 @@ class MethodChannelStripeTapToPay extends StripeTapToPayPlatform {
         PaymentResult.fromJson(json.decode(result ?? '{}'));
     if (paymentResult.status == PaymentStatus.PAYMENT_SUCCESS) {
       onPaymentSuccess(paymentResult.data);
-    } else if (paymentResult.status == PaymentStatus.PAYMENT_SUCCESS) {
+    } else if (paymentResult.status == PaymentStatus.PAYMENT_ERROR) {
       onPaymentError(paymentResult.message);
     } else {
       onPaymentCancelled();
