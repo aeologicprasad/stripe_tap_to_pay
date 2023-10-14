@@ -244,7 +244,7 @@ object StripeTerminal {
             override fun onFailure(e: TerminalException) {
                 Log.e(TAG, e.errorMessage)
                 val paymentResult = mapOf<String, Any?>(
-                    "status" to com.example.stripe_tap_to_pay.enum.PaymentStatus.PAYMENT_ERROR,
+                    "status" to PaymentStatus.PAYMENT_ERROR,
                     "message" to e.errorMessage,
                     "data" to null,
                 )

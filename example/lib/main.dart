@@ -50,13 +50,13 @@ class _MyHomePageState extends State<MyHomePage> {
       try {
         final result =
             await _plugin.initializeStripeTerminal(token: value['secret']);
-        debugPrint("Terminal Result: $result");
+        debugPrint("initializeTerminal: $result");
       } on PlatformException catch (e) {
         debugPrint('$e');
         Fluttertoast.showToast(msg: e.message ?? 'Error occurred');
       }
     }).onError((error, stackTrace) {
-      debugPrint('$error');
+      debugPrint('initializeTerminal: $error');
       Fluttertoast.showToast(msg: error?.toString() ?? 'Error occurred');
     });
   }
@@ -89,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
       }).onError((error, stackTrace) => null);
     } on PlatformException catch (e) {
-      debugPrint('Error: $e');
+      debugPrint('createPayment: $e');
       Fluttertoast.showToast(msg: e.message ?? 'Error occurred');
     }
   }
@@ -100,7 +100,17 @@ class _MyHomePageState extends State<MyHomePage> {
       debugPrint('isTerminalInitialized: $result');
       setState(() {});
     } on PlatformException catch (e) {
-      // debugPrint('Error: $e');
+      debugPrint('isTerminalInitialized: $e');
+      Fluttertoast.showToast(msg: e.message ?? 'Error occurred');
+    }
+  }
+
+  void isReaderConnected() async {
+    try {
+      final result = await _plugin.isReaderConnected();
+      debugPrint('isReaderConnected: $result');
+    } on PlatformException catch (e) {
+      debugPrint('isReaderConnected: $e');
       Fluttertoast.showToast(msg: e.message ?? 'Error occurred');
     }
   }
@@ -149,6 +159,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: const Text('Create Payment')),
             const SizedBox(height: 30),
             Text('Reader: $readerData'),
+            const Spacer(),
+            ElevatedButton(
+                onPressed: () {
+                  checkIsTerminalInitialized();
+                },
+                child: const Text('Is Terminal Initialized ?')),
+            ElevatedButton(
+                onPressed: () {
+                  isReaderConnected();
+                },
+                child: const Text('Is Reader Connected ?')),
           ],
         ),
       ),
