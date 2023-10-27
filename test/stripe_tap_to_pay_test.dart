@@ -43,7 +43,8 @@ class MockStripeTapToPayPlatform
   }
 
   @override
-  Future<bool> initializeStripeTerminal({required String token}) {
+  Future<bool> initializeStripeTerminal(
+      {required String token, required String locationId}) {
     // TODO: implement initializeStripeTerminal
     throw UnimplementedError();
   }

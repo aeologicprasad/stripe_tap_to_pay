@@ -48,8 +48,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> initializeTerminal() async {
     apiClient.post('/connection_token').then((value) async {
       try {
-        final result =
-            await _plugin.initializeStripeTerminal(token: value['secret']);
+        final result = await _plugin.initializeStripeTerminal(
+            token: value['secret'], locationId: '');
         debugPrint("Terminal Result: $result");
       } on PlatformException catch (e) {
         debugPrint('$e');

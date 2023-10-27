@@ -16,9 +16,10 @@ class MethodChannelStripeTapToPay extends StripeTapToPayPlatform {
   final methodChannel = const MethodChannel('stripe_tap_to_pay');
 
   @override
-  Future<bool> initializeStripeTerminal({required String token}) async {
-    final result = await methodChannel
-        .invokeMethod<bool?>('initializeStripeTerminal', {'token': token});
+  Future<bool> initializeStripeTerminal(
+      {required String token, required String locationId}) async {
+    final result = await methodChannel.invokeMethod<bool?>(
+        'initializeStripeTerminal', {'token': token, 'locationId': locationId});
     return result ?? false;
   }
 

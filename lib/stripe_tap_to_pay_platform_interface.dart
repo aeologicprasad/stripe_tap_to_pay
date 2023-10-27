@@ -25,7 +25,8 @@ abstract class StripeTapToPayPlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<bool> initializeStripeTerminal({required String token}) {
+  Future<bool> initializeStripeTerminal(
+      {required String token, required String locationId}) {
     throw UnimplementedError(
         'initializeStripeTerminal() has not been implemented.');
   }

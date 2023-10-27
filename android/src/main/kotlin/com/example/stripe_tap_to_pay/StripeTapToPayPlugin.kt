@@ -43,7 +43,9 @@ class StripeTapToPayPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
         when (call.method) {
             "initializeStripeTerminal" -> {
                 val token = call.argument<String>("token") ?: ""
+                val locationId = call.argument<String>("locationId") ?: ""
                 StripeTerminal.token = token
+                StripeTerminal.locationId = locationId
                 StripeTerminal.setupTapToPay()
             }
 

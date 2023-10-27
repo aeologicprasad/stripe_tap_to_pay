@@ -4,9 +4,10 @@ import 'data/reader.dart';
 import 'stripe_tap_to_pay_platform_interface.dart';
 
 class StripeTapToPay {
-  Future<bool> initializeStripeTerminal({required String token}) {
+  Future<bool> initializeStripeTerminal(
+      {required String token, required String locationId}) {
     return StripeTapToPayPlatform.instance
-        .initializeStripeTerminal(token: token);
+        .initializeStripeTerminal(token: token, locationId: locationId);
   }
 
   Future<Reader> connectReader({bool isSimulated = false}) {

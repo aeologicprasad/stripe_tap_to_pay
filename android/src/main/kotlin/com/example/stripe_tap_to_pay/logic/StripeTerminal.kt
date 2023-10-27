@@ -36,12 +36,13 @@ object StripeTerminal {
 
     // Class members for secret, activity, and result
     var token: String? = null
+    var locationId: String? = null
     var activity: Activity? = null
     var result: MethodChannel.Result? = null
 
     private var SKIP_TIPPING = false
     private val gson = Gson()
-    private val locationsList = MutableStateFlow(LocationListState())
+//    private val locationsList = MutableStateFlow(LocationListState())
     private var isSimulated = false
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -72,15 +73,17 @@ object StripeTerminal {
 
     fun connectReader(isSimulated: Boolean) {
         this.isSimulated = isSimulated
-        if (locationsList.value.locations.isEmpty()) {
+        discoverReaders()
+
+        /*if (locationsList.value.locations.isEmpty()) {
             loadLocations()
         } else {
             discoverReaders()
-        }
+        }*/
     }
 
 
-    private fun loadLocations() {
+    /*private fun loadLocations() {
         Log.d(TAG, "Loading Reader locations...")
 
         Terminal.getInstance().listLocations(
@@ -106,7 +109,7 @@ object StripeTerminal {
                 }
             }
         )
-    }
+    }*/
 
 
     fun disconnectReader() {
@@ -156,7 +159,7 @@ object StripeTerminal {
             timeout = 0,
             discoveryMethod = DiscoveryMethod.LOCAL_MOBILE,
             isSimulated = isSimulated,
-            location = locationsList.value.locations[0].id
+            location = locationId
         )
 
         Terminal.getInstance().discoverReaders(config, discoveryListener = object :
@@ -166,7 +169,7 @@ object StripeTerminal {
                 val reader = readers[0]
 
                 val configs =
-                    ConnectionConfiguration.LocalMobileConnectionConfiguration("${locationsList.value.locations[0].id}")
+                    ConnectionConfiguration.LocalMobileConnectionConfiguration("$locationId")
 
                 Terminal.getInstance().connectLocalMobileReader(
                     reader,
